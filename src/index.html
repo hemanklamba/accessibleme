@@ -110,6 +110,10 @@
 						<option>Low</option>
 					</select>
 				</fieldset>
+				<fieldset>
+					<textarea type="hidden" name="latitude" id="latitude"></textarea>
+					<textarea type="hidden" name="longitude" id="longitude"></textarea>
+				</fieldset>
 				<button type="submit" class="btn btn-primary" id="form-btn" >Submit</button>
 			</form>
 		</div>	
@@ -208,16 +212,13 @@
 		
 		$("#report-msg").addClass("hidden");
 		$("#report-form").removeClass("hidden");
-		latitude = e.latlong[0];
-		longitude = e.latlong[1];
+		$("#latitude").val(e.latlng.lat.toString());
+		$("#longitude").val(e.latlng.lng.toString());
       popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
         .openOn(map);
     }
-	
-	
-	
 	
     map.on('click', onMapClick);
 
