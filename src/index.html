@@ -97,20 +97,20 @@
 			<h2>Click on the map to report and incident</h2>
 		</div>
 	    <div id="report-form" class="col-sm-4 hidden">
-			<form>
+			<form id="incident" action="/onformsubmit">
 				<fieldset class="form-group">
-					<label for="exampleTextarea">Enter a description of the incident</label>
-					<textarea class="form-control" id="exampleTextarea" rows="3"></textarea>
+					<label for="text_desc">Enter a description of the incident</label>
+					<textarea class="form-control" id="text_desc" rows="3"></textarea>
 				</fieldset>
 				<fieldset class="form-group">
-					<label for="exampleSelect1">Choose Urgency</label>
-					<select class="form-control" id="exampleSelect1">
+					<label for="urgency_level">Choose Urgency</label>
+					<select class="form-control" id="urgency_level">
 						<option>High</option>
 						<option>Medium</option>
 						<option>Low</option>
 					</select>
 				</fieldset>
-				<button type="submit" class="btn btn-primary">Submit</button>
+				<button type="submit" class="btn btn-primary" id="form-btn" >Submit</button>
 			</form>
 		</div>	
 
@@ -131,7 +131,8 @@
 		
 		// Create Leaflet map object
     var map = L.map('mapid',{ center: [42.381899, -71.122499], zoom: 13});
-
+	var latitude;
+	var longitude;
     // Add Tile Layer basemap
     L.tileLayer('http://tiles.mapc.org/basemap/{z}/{x}/{y}.png', {
       attribution: 'Tiles by <a href="http://mapc.org">MAPC</a>, Data by <a href="http://mass.gov/mgis">MassGIS</a>',
@@ -207,12 +208,17 @@
 		
 		$("#report-msg").addClass("hidden");
 		$("#report-form").removeClass("hidden");
+		latitude = e.latlong.lat;
+		longitude = e.latlong.long;
       popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
         .openOn(map);
     }
-
+	
+	
+	
+	
     map.on('click', onMapClick);
 
 	</script>
