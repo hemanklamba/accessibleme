@@ -28,14 +28,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script>
     // Create Leaflet map object
-    var map = L.map('map',{ center: [40.82, -73.76], zoom: 12});
+    var map = L.map('map',{ center: [40.82, -73.76], zoom: 10});
 
     // Add Tile Layer basemap
-      var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-      var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
-
-
-    L.tileLayer(osmUrl, {minZoom: 8, maxZoom: 12, attribution: osmAttrib}).addTo(map);
+    L.tileLayer('http://tiles.mapc.org/basemap/{z}/{x}/{y}.png', {
+      attribution: 'Tiles by <a href="http://mapc.org">MAPC</a>, Data by <a href="http://mass.gov/mgis">MassGIS</a>',
+      maxZoom: 17,
+      minZoom: 9
+    }).addTo(map);
 
     // Global Variables
     // Will go here
@@ -45,6 +45,7 @@
     // Get all coffee cafes from dataset
     var sqlQuery = "SELECT * FROM table_2016_01_05_311";
     // Get all coffee cafes that have name 'Starbucks'
+    var sqlQueryStarbucks = "SELECT * FROM coffee_cafes WHERE name='Starbucks'";
 
     // Set CartoDB Username
     var cartoDBUserName = "accecibleme";
@@ -55,6 +56,7 @@
       $.getJSON("https://"+cartoDBUserName+".cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQuery, function(data) {
         coffeeShopLocations = L.geoJson(data,{
           onEachFeature: function (feature, layer) {
+s            layer.cartodb_id=feature.properties.cartodb_id;
           }
         }).addTo(map);
       });
@@ -65,11 +67,25 @@
       showAll();
     });
 
-    // Function to Filter Starbucksstar
+    // Function to Filter Starbucks
+    function showStarbucks(){
+      if(map.hasLayer(coffeeShopLocations)){
+        map.removeLayer(coffeeShopLocations);
+      };
+      $.getJSON("https://"+cartoDBUserName+".cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQueryStarbucks, function(data) {
+        coffeeShopLocations = L.geoJson(data,{
+          onEachFeature: function (feature, layer) {
 
+            layer.cartodb_id=feature.properties.cartodb_id;
+          }
+        }).addTo(map);
+      });
+    };
 
     // Event Listeners
-
+    $('input[value=starbucks]').click(function(){
+      showStarbucks();
+    });
 
     $('input[value=all]').click(function(){
       showAll();
