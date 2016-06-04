@@ -100,11 +100,11 @@
 			<form id="incident" action="/onformsubmit">
 				<fieldset class="form-group">
 					<label for="text_desc">Enter a description of the incident</label>
-					<textarea class="form-control" id="text_desc" rows="3"></textarea>
+					<textarea class="form-control" name="text_desc" id="text_desc" rows="3"></textarea>
 				</fieldset>
 				<fieldset class="form-group">
 					<label for="urgency_level">Choose Urgency</label>
-					<select class="form-control" id="urgency_level">
+					<select class="form-control" id="urgency_level" name="urgency_level">
 						<option>High</option>
 						<option>Medium</option>
 						<option>Low</option>
@@ -208,8 +208,8 @@
 		
 		$("#report-msg").addClass("hidden");
 		$("#report-form").removeClass("hidden");
-		latitude = e.latlong.lat;
-		longitude = e.latlong.long;
+		latitude = e.latlong[0];
+		longitude = e.latlong[1];
       popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
