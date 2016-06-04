@@ -74,64 +74,146 @@
 
     <div class="container theme-showcase" role="main">
 
-      <!-- Main jumbotron for a primary marketing message or call to action -->
-      <div class="jumbotron">
-        <h1>Accessible Route Finder</h1>
-        <p>This is a template showcasing the optional theme stylesheet included in Bootstrap. Use it as a starting point to create something more unique by building on or modifying it.</p>
-      </div>
-
-      <div class="page-header">
-        <h1>Map</h1>
-      </div>
-      <div id="mapid" style="width: 600px; height: 400px"></div>
-
-      <form>
-  <fieldset class="form-group">
-    <label for="exampleTextarea">Description</label>
-    <textarea class="form-control" id="exampleTextarea" rows="3"></textarea>
-  </fieldset>
-  <fieldset class="form-group">
-    <label for="exampleSelect1">Choose Urgency</label>
-    <select class="form-control" id="exampleSelect1">
-      <option>1</option>
-      <option>2</option>
-      <option>3</option>
-      <option>4</option>
-      <option>5</option>
-    </select>
-  </fieldset>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-
+		<!-- Main jumbotron for a primary marketing message or call to action -->
+		<div class="jumbotron">
+			<h1>Accessible Route Finder</h1>
+			<p>This is a template showcasing the optional theme stylesheet included in Bootstrap. Use it as a starting point to create something more unique by building on or modifying it.</p>
+		</div>
+	
+		<div class= "col-sm-8">
+			<div id="mapid" style="width: 600px; height: 400px">
+			</div>
+			<div id="controls">
+				<div id="form">
+				<form action="">
+					<input type="radio" name="filter" value="all" checked>Show All Issues
+					<input type="radio" name="filter" value="starbucks">User Reported Only
+				</form>
+			</div>
+			<div id="credits"><p>Data from <a href="http://www.referenceusa.com/">ReferenceUSA</a><br>#webMapWorkshop - &copy;2015, Mike Foster</p></div>
+			</div>
+		</div>
+		<div id="report-msg" class="col-sm-4">
+			<h2>Click on the map to report and incident</h2>
+		</div>
+	    <div id="report-form" class="col-sm-4 hidden">
+			<form>
+				<fieldset class="form-group">
+					<label for="exampleTextarea">Enter a description of the incident</label>
+					<textarea class="form-control" id="exampleTextarea" rows="3"></textarea>
+				</fieldset>
+				<fieldset class="form-group">
+					<label for="exampleSelect1">Choose Urgency</label>
+					<select class="form-control" id="exampleSelect1">
+						<option>High</option>
+						<option>Medium</option>
+						<option>Low</option>
+					</select>
+				</fieldset>
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</form>
+		</div>	
 
       
 
 
     </div> <!-- /container -->
-	
 	<script>
+		//var map = L.map('mapid').setView([40.74622, -73.97515], 13);
 
-		var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+//		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+//			maxZoom: 18,
+//			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+//				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+//				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+//			id: 'mapbox.streets'
+//		}).addTo(map);
+		
+		// Create Leaflet map object
+    var map = L.map('mapid',{ center: [42.381899, -71.122499], zoom: 13});
 
-		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-			id: 'mapbox.streets'
-		}).addTo(mymap);
+    // Add Tile Layer basemap
+    L.tileLayer('http://tiles.mapc.org/basemap/{z}/{x}/{y}.png', {
+      attribution: 'Tiles by <a href="http://mapc.org">MAPC</a>, Data by <a href="http://mass.gov/mgis">MassGIS</a>',
+      maxZoom: 17,
+      minZoom: 9
+    }).addTo(map);
 
+// Add Tile Layer basemap
+    L.tileLayer('http://tiles.mapc.org/basemap/{z}/{x}/{y}.png', {
+      attribution: 'Tiles by <a href="http://mapc.org">MAPC</a>, Data by <a href="http://mass.gov/mgis">MassGIS</a>',
+      maxZoom: 17,
+      minZoom: 9
+    }).addTo(map);
 
-		var popup = L.popup();
+    // Global Variables
+    // Will go here
+    var coffeeShopLocations = null;
 
-		function onMapClick(e) {
-			popup
-				.setLatLng(e.latlng)
-				.setContent("You clicked the map at " + e.latlng.toString())
-				.openOn(mymap);
-		}
+    // Database Queries
+    // Get all coffee cafes from dataset
+    var sqlQuery = "SELECT * FROM coffee_cafes";
+    // Get all coffee cafes that have name 'Starbucks'
+    var sqlQueryStarbucks = "SELECT * FROM coffee_cafes WHERE name='Starbucks'";
 
-		mymap.on('click', onMapClick);
+    // Set CartoDB Username
+    var cartoDBUserName = "accecibleme";
+
+    // Function to add call coffee shops
+    // Get CartoDB selection as GeoJSON and Add to Map
+    function showAll(){
+      $.getJSON("https://"+cartoDBUserName+".cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQuery, function(data) {
+        coffeeShopLocations = L.geoJson(data,{
+          onEachFeature: function (feature, layer) {
+            layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.address + '</em></p>');
+            layer.cartodb_id=feature.properties.cartodb_id;
+          }
+        }).addTo(map);
+      });
+    };
+
+    // Run showAll function automatically when document loads
+    $( document ).ready(function() {
+      showAll();
+    });
+
+    // Function to Filter Starbucks
+    function showStarbucks(){
+      if(map.hasLayer(coffeeShopLocations)){
+        map.removeLayer(coffeeShopLocations);
+      };
+      $.getJSON("https://"+cartoDBUserName+".cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQueryStarbucks, function(data) {
+        coffeeShopLocations = L.geoJson(data,{
+          onEachFeature: function (feature, layer) {
+            layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.address + '</em></p>');
+            layer.cartodb_id=feature.properties.cartodb_id;
+          }
+        }).addTo(map);
+      });
+    };
+
+    // Event Listeners
+    $('input[value=starbucks]').click(function(){
+      showStarbucks();
+    });
+
+    $('input[value=all]').click(function(){
+      showAll();
+    });
+
+        var popup = L.popup();
+
+    function onMapClick(e) {
+		
+		$("#report-msg").addClass("hidden");
+		$("#report-form").removeClass("hidden");
+      popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+    }
+
+    map.on('click', onMapClick);
 
 	</script>
 	
