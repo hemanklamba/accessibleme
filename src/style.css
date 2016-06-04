@@ -17,5 +17,9 @@ body {
   width: auto;
 }
 #mapid { 
-	height: 180px; 
+	height: 100%; 
+}
+
+.hidden {
+     display:none;
 }
